@@ -19,13 +19,10 @@ export default defineConfig(({ mode }) => {
           '@': path.resolve(__dirname, '.'),
         }
       },
-      // 👇 AÑADE ESTO para evitar problemas con módulos Node.js
+      // 👇 ESTO ES CORRECTO - Quita 'replicate' si no lo usas
       build: {
         rollupOptions: {
-          external: ['replicate', '@google/genai', 'fs', 'path', 'os'],
-        },
-        commonjsOptions: {
-          transformMixedEsModules: true,
+          external: ['@google/genai', 'fs', 'path', 'os', 'child_process', 'crypto'],
         },
       },
     };
