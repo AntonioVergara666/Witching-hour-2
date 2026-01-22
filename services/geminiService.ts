@@ -2,9 +2,14 @@
 import { GenerationParams } from "../types";
 
 export const generateWitchImage = async (params: GenerationParams): Promise<string> => {
-  // Tu API key de Fal.AI (consíguela en fal.ai)
-  const FAL_API_KEY = import.meta.env.VITE_FAL_API_KEY || "347ac939-22c3-4f0c-83e0-17c70a33b604:8444930b2827b1e61caa682e99fa9cbc";
+  console.log("🔮 DEBUG: Iniciando generación...");
+  console.log("🔮 DEBUG: API Key existe?", !!import.meta.env.VITE_FAL_API_KEY);
   
+  const FAL_API_KEY = import.meta.env.VITE_FAL_API_KEY;
+  
+  if (!FAL_API_KEY || FAL_API_KEY === "tu_api_key_aqui") {
+    throw new Error("❌ **Falta API Key**\n\nConfigura VITE_FAL_API_KEY en Vercel");
+  }
   const prompt = `A high-quality, cinematic digital painting of a ${params.archetype} witch. ${params.prompt}. 
   Ethereal lighting, intricate details, mystical atmosphere, dark fantasy aesthetic, 
   vibrant magical effects, professional artistic style, masterpiece, sharp focus, 
