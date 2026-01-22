@@ -18,6 +18,15 @@ export default defineConfig(({ mode }) => {
         alias: {
           '@': path.resolve(__dirname, '.'),
         }
-      }
+      },
+      // 👇 AÑADE ESTO para evitar problemas con módulos Node.js
+      build: {
+        rollupOptions: {
+          external: ['replicate', '@google/genai', 'fs', 'path', 'os'],
+        },
+        commonjsOptions: {
+          transformMixedEsModules: true,
+        },
+      },
     };
 });

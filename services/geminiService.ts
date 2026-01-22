@@ -3,9 +3,9 @@ import { GenerationParams } from "../types";
 
 // Configura Fal - USA ESTA KEY PÚBLICA PARA PRUEBAS (o tu propia key)
 fal.config({
-  // Usa esta key pública temporal O tu key privada
-  credentials: "347ac939-22c3-4f0c-83e0-17c70a33b604:8444930b2827b1e61caa682e99fa9cbc", // Ejemplo, reemplaza con tu key real
+  credentials: "347ac939-22c3-4f0c-83e0-17c70a33b604:8444930b2827b1e61caa682e99fa9cbc", // Tu key de Fal.AI
 });
+
 export const generateWitchImage = async (params: GenerationParams): Promise<string> => {
   // Prompt mejorado para brujas/fantasía oscura
   const prompt = `A high-quality, cinematic digital painting of a ${params.archetype} witch. ${params.prompt}. 
@@ -15,49 +15,31 @@ export const generateWitchImage = async (params: GenerationParams): Promise<stri
   
   const negativePrompt = "blurry, bad quality, deformed, ugly, bad anatomy, extra limbs, poorly drawn, watermark, signature, text, cartoon, 3d, realistic";
   
-  // Configuración de tamaño según aspect ratio
-  let width = 768;
-  let height = 768;
-  
-  if (params.aspectRatio === 'LANDSCAPE') {
-    width = 1024;
-    height = 768;
-  } else if (params.aspectRatio === 'PORTRAIT') {
-    width = 768;
-    height = 1024;
-  }
-  
   try {
-    // Modelo: Stable Diffusion XL - excelente para fantasía
-    const output = await replicate.run(
-      "stability-ai/stable-diffusion:db21e45d3f7023abc2a46ee38a23973f6dce16bb082a930b0c49861f96d1e5bf",
-      {
-        input: {
-          prompt: prompt,
-          negative_prompt: negativePrompt,
-          width: width,
-          height: height,
-          num_outputs: 1,
-          num_inference_steps: 30, // Más pasos = mejor calidad
-          guidance_scale: 7.5, // Creatividad vs. seguir prompt
-          scheduler: "DPMSolverMultistep",
-        }
+    // 👇 CORREGIDO: Usa fal.run() NO replicate.run()
+    const result = await fal.run("fal-ai/fast-sdxl", {
+      input: {
+        prompt: prompt,
+        negative_prompt: negativePrompt,
+        image_size: params.aspectRatio === 'LANDSCAPE' ? "landscape_16_9" : "portrait_9_16",
+        num_images: 1,
+        enable_safety_checker: true,
       }
-    ) as string[];
+    });
     
-    // output es un array: ["https://replicate.delivery/.../output.png"]
-    if (!output || !output[0]) {
+    // result tiene una estructura diferente a replicate
+    if (!result?.data?.images?.[0]?.url) {
       throw new Error("El aquelarre no produjo ninguna imagen.");
     }
     
-    return output[0]; // Devuelve la URL de la imagen
+    return result.data.images[0].url; // Devuelve la URL de la imagen
     
   } catch (error: any) {
     console.error("Error en la conjuración:", error);
     
     // Manejo de errores en español
     if (error?.status === 401 || error?.message?.includes("auth") || error?.message?.includes("API key")) {
-      throw new Error("🔐 **API Key inválida**\n\nRevisa tu clave de Replicate en las variables de entorno.");
+      throw new Error("🔐 **API Key inválida**\n\nRevisa tu clave de Fal.AI.");
     }
     
     if (error?.status === 429) {
@@ -69,7 +51,7 @@ export const generateWitchImage = async (params: GenerationParams): Promise<stri
     }
     
     // Error general
-    throw new Error("¡El hechizo falló! 🌙\n\nLos espíritus de Stable Diffusion no responden. Intenta nuevamente.");
+    throw new Error("¡El hechizo falló! 🌙\n\nLos espíritus no responden. Intenta nuevamente.");
   }
 };
 
