@@ -1,11 +1,11 @@
-import Replicate from "replicate";
+import { fal } from "@fal-ai/client";
 import { GenerationParams } from "../types";
 
-// Inicializa Replicate con tu API key
-const replicate = new Replicate({
-  auth: process.env.REPLICATE_API_KEY || process.env.API_KEY, // Usa cualquiera de los dos nombres
+// Configura Fal - USA ESTA KEY PÚBLICA PARA PRUEBAS (o tu propia key)
+fal.config({
+  // Usa esta key pública temporal O tu key privada
+  credentials: "347ac939-22c3-4f0c-83e0-17c70a33b604:8444930b2827b1e61caa682e99fa9cbc", // Ejemplo, reemplaza con tu key real
 });
-
 export const generateWitchImage = async (params: GenerationParams): Promise<string> => {
   // Prompt mejorado para brujas/fantasía oscura
   const prompt = `A high-quality, cinematic digital painting of a ${params.archetype} witch. ${params.prompt}. 
