@@ -37,5 +37,20 @@ export const generateWitchImage = async (params: GenerationParams): Promise<stri
   } catch (error: any) {
     console.error("Conjuration Error:", error);
     throw error;
+ 
+ 
+    
+    if (error?.code === 429 || error?.status === 'RESOURCE_EXHAUSTED') {
+      throw new Error("🕒 **Please wait one minute**\n\nThe magical energies need to recharge. Too many spells at once!");
+    }
+    
+    
+    if (error?.message?.includes("quota") || error?.message?.includes("Quota")) {
+      throw new Error("🌙 **Daily magic limit reached**\n\nPlease try again in a little while.");
+    }
+    
+    
+    throw new Error("The spell failed! The coven is busy. Try again.");
+    
   }
 };
